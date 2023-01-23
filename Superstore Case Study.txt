@@ -1,0 +1,106 @@
+Superstore Case Study SQL
+
+1) -- number of orders and Maximum quantity sold
+select max(quantity) as max_quantity, 
+count(*) as number_of_orders 
+from [dbo].[TR_OrderDetails]
+
+
+2)-- Count Unique products on sale
+
+select count(productname)
+from [dbo].[TR_Products]
+where productname in
+(select distinct productname
+from [dbo].[TR_Products])
+
+
+3) -- Unique Property and cities
+
+select distinct propertyid,
+propertycity
+from [TR_OrderDetails]
+join [TR_PropertyInfo]
+on [TR_OrderDetails].PropertyID = [TR_PropertyInfo].[Prop ID]
+
+
+4) -- Which category has most products
+
+select  top 1 ProductCategory, count (productid) as count
+from [dbo].[TR_Products]
+group by ProductCategory
+order by count desc
+
+
+5) -- state with most stores
+
+select top 1 propertystate, count([Prop ID]) as count
+from [dbo].[TR_PropertyInfo]
+group by PropertyState
+order by count desc	
+
+6)-- Top 5 Products with maximum sales in terms of quantity
+
+select top 5 [dbo].[TR_OrderDetails].productid,[dbo].[TR_Products]. productname, sum(quantity) as max
+from [dbo].[TR_OrderDetails]
+join [dbo].[TR_Products]
+on [dbo].[TR_OrderDetails].ProductID = [dbo].[TR_Products].ProductID
+group by [dbo].[TR_OrderDetails].productid, [dbo].[TR_Products]. productname
+order by max desc
+
+7) -- Joining all 3 tables
+
+select top 5 [dbo].[TR_OrderDetails].productid,
+[dbo].[TR_PropertyInfo].[Prop ID],
+[dbo].[TR_Products]. productname,
+sum(quantity) as max
+from [dbo].[TR_OrderDetails]
+join [dbo].[TR_Products]
+on [dbo].[TR_OrderDetails].ProductID = [dbo].[TR_Products].ProductID
+join [dbo].[TR_PropertyInfo]
+on [dbo].[TR_OrderDetails].[PropertyID] = [dbo].[TR_PropertyInfo].[Prop ID]
+group by [dbo].[TR_OrderDetails].productid, [dbo].[TR_Products]. productname, [dbo].[TR_PropertyInfo].[Prop ID]
+order by max desc
+
+8)-- Best selling products
+
+select top 5 [dbo].[TR_OrderDetails].productid,
+[dbo].[TR_Products]. productname,
+sum(Quantity * Price) as total_sales
+from [dbo].[TR_OrderDetails]
+join [dbo].[TR_Products]
+on [dbo].[TR_OrderDetails].ProductID = [dbo].[TR_Products].ProductID
+group by [dbo].[TR_OrderDetails].productid, [dbo].[TR_Products]. productname, dbo.TR_OrderDetails.Quantity, dbo.TR_Products.Price 
+order by total_sales desc
+
+
+9)-- Best selling cities
+
+select top 5
+sum (Quantity * Price) as total_sales,
+[dbo].[TR_PropertyInfo].[PropertyCity]
+from [dbo].[TR_OrderDetails]
+join [dbo].[TR_Products]
+on [dbo].[TR_OrderDetails].ProductID = [dbo].[TR_Products].ProductID
+join [dbo].[TR_PropertyInfo]
+on [dbo].[TR_OrderDetails].[PropertyID] = [dbo].[TR_PropertyInfo].[Prop ID]
+group by [dbo].[TR_PropertyInfo].[PropertyCity]
+order by total_sales desc
+
+
+10) -- Top 5 Selling products for Arlington
+
+select top 5
+[dbo].[TR_Products].[ProductName],
+sum (Quantity * Price) as total_sales,
+[dbo].[TR_PropertyInfo].[PropertyCity]
+from [dbo].[TR_OrderDetails]
+join [dbo].[TR_Products]
+on [dbo].[TR_OrderDetails].ProductID = [dbo].[TR_Products].ProductID
+join [dbo].[TR_PropertyInfo]
+on [dbo].[TR_OrderDetails].[PropertyID] = [dbo].[TR_PropertyInfo].[Prop ID]
+where propertycity = 'Arlington'
+group by [dbo].[TR_PropertyInfo].[PropertyCity], [dbo].[TR_Products].[ProductName]
+order by total_sales desc
+	
+
